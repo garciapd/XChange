@@ -119,14 +119,18 @@ public class HitbtcTradeServiceRaw extends HitbtcBaseService {
     return hitbtc.getHitbtcTrades(symbol, sortValue, "id", fromValue, tillValue, limit, offset);
   }
 
-  public HitbtcOrder getHitbtcOrder(String symbol, String clientOrderId) throws IOException {
-    List<HitbtcOrder> orders = hitbtc.getHitbtcOrder(symbol, clientOrderId);
+  public HitbtcOrder getHistoricalHitbtcOrder(String symbol, String clientOrderId) throws IOException {
+    List<HitbtcOrder> orders = hitbtc.getHistoricalHitbtcOrder(symbol, clientOrderId);
 
     if (orders == null || orders.isEmpty()) {
       return null;
     } else {
       return orders.iterator().next();
     }
+  }
+
+  public HitbtcOrder getHitbtcOrder(String clientOrderId) throws IOException {
+    return hitbtc.getHitbtcOrder(clientOrderId);
   }
 
   public List<HitbtcBalance> getTradingBalance() throws IOException {

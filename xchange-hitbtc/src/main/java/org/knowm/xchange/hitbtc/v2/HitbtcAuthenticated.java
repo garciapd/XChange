@@ -1,9 +1,5 @@
 package org.knowm.xchange.hitbtc.v2;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -14,6 +10,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
 import org.knowm.xchange.hitbtc.v2.dto.HitbtcAddress;
 import org.knowm.xchange.hitbtc.v2.dto.HitbtcBalance;
 import org.knowm.xchange.hitbtc.v2.dto.HitbtcException;
@@ -75,6 +76,13 @@ public interface HitbtcAuthenticated extends Hitbtc {
   @GET
   @Path("order")
   List<HitbtcOrder> getHitbtcActiveOrders() throws IOException, HitbtcException;
+
+  @GET
+  @Path("order/{clientOrderId}")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  HitbtcOrder getHitbtcOrder(
+          @PathParam("clientOrderId") String clientOrderId)
+          throws IOException, HitbtcException;
 
   @POST
   @Path("order")
@@ -151,7 +159,7 @@ public interface HitbtcAuthenticated extends Hitbtc {
    */
   @GET
   @Path("history/order")
-  List<HitbtcOrder> getHitbtcOrder(
+  List<HitbtcOrder> getHistoricalHitbtcOrder(
       @QueryParam("symbol") String symbol, @QueryParam("clientOrderId") String clientOrderId)
       throws IOException, HitbtcException;
 

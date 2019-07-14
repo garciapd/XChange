@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.dto.Order;
@@ -16,7 +17,13 @@ import org.knowm.xchange.hitbtc.v2.HitbtcAdapters;
 import org.knowm.xchange.hitbtc.v2.dto.HitbtcOrder;
 import org.knowm.xchange.hitbtc.v2.dto.HitbtcOwnTrade;
 import org.knowm.xchange.service.trade.TradeService;
-import org.knowm.xchange.service.trade.params.*;
+import org.knowm.xchange.service.trade.params.CancelOrderByIdParams;
+import org.knowm.xchange.service.trade.params.CancelOrderParams;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamCurrencyPair;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamLimit;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamOffset;
+import org.knowm.xchange.service.trade.params.TradeHistoryParamPaging;
+import org.knowm.xchange.service.trade.params.TradeHistoryParams;
 import org.knowm.xchange.service.trade.params.orders.OpenOrdersParams;
 import org.knowm.xchange.service.trade.params.orders.OrderQueryParamCurrencyPair;
 import org.knowm.xchange.service.trade.params.orders.OrderQueryParams;
@@ -108,7 +115,7 @@ public class HitbtcTradeService extends HitbtcTradeServiceRaw implements TradeSe
             "Parameters must be an instance of OrderQueryParamCurrencyPair");
       }
       HitbtcOrder rawOrder =
-          getHitbtcOrder(
+          getHistoricalHitbtcOrder(
               HitbtcAdapters.adaptCurrencyPair(
                   ((OrderQueryParamCurrencyPair) param).getCurrencyPair()),
               param.getOrderId());
@@ -118,4 +125,18 @@ public class HitbtcTradeService extends HitbtcTradeServiceRaw implements TradeSe
 
     return orders;
   }
+
+  @Override
+  public Collection<Order> getOrder(String... orderIds) throws IOException {
+    List<Order> orders = new ArrayList<>();
+    for( String orderId : orderIds) {
+      HitbtcOrder hitbtcOrder = getHitbtcOrder(orderId);
+      if (hitbtcOrder != null) {
+        orders.add(HitbtcAdapters.adaptOrder(hitbtcOrder));
+      }
+    }
+
+    return orders;
+  }
+
 }
