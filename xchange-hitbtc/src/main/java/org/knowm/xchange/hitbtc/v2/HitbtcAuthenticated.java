@@ -79,7 +79,6 @@ public interface HitbtcAuthenticated extends Hitbtc {
 
   @GET
   @Path("order/{clientOrderId}")
-  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   HitbtcOrder getHitbtcOrder(
           @PathParam("clientOrderId") String clientOrderId)
           throws IOException, HitbtcException;
