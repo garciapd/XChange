@@ -2,6 +2,7 @@ package org.knowm.xchange.hitbtc.v2.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -129,11 +130,14 @@ public class HitbtcTradeService extends HitbtcTradeServiceRaw implements TradeSe
   @Override
   public Collection<Order> getOrder(String... orderIds) throws IOException {
     List<Order> orders = new ArrayList<>();
-    for( String orderId : orderIds) {
-      HitbtcOrder hitbtcOrder = getHitbtcOrder(orderId);
-      if (hitbtcOrder != null) {
-        orders.add(HitbtcAdapters.adaptOrder(hitbtcOrder));
-      }
+    List<String> orderIdsList = Arrays.asList(orderIds);
+    List<HitbtcOrder> hitbtcOrders = getOpenOrdersRaw();
+    if (hitbtcOrders != null) {
+        hitbtcOrders.forEach(hitbtcOrder -> {
+            if ( orderIdsList.contains(hitbtcOrder.id)) {
+                orders.add(HitbtcAdapters.adaptOrder(hitbtcOrder));
+            }
+        });
     }
 
     return orders;
