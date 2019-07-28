@@ -3,6 +3,7 @@ package org.knowm.xchange.bitfinex.v1.service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
+
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.bitfinex.common.dto.BitfinexException;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexAccountFeesResponse;
@@ -10,6 +11,7 @@ import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexBalanceHistoryRequest;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexBalanceHistoryResponse;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexBalancesRequest;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexBalancesResponse;
+import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexCurrencyLabels;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexDepositAddressRequest;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexDepositAddressResponse;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexDepositWithdrawalHistoryRequest;
@@ -21,7 +23,8 @@ import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexTradingFeesRequest;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexWithdrawalRequest;
 import org.knowm.xchange.bitfinex.v1.dto.account.BitfinexWithdrawalResponse;
 import org.knowm.xchange.bitfinex.v1.dto.trade.BitfinexNonceOnlyRequest;
-import org.knowm.xchange.exceptions.*;
+import org.knowm.xchange.exceptions.ExchangeException;
+import si.mazi.rescu.RestProxyFactory;
 
 public class BitfinexAccountServiceRaw extends BitfinexBaseService {
 
@@ -30,9 +33,16 @@ public class BitfinexAccountServiceRaw extends BitfinexBaseService {
    *
    * @param exchange
    */
-  public BitfinexAccountServiceRaw(Exchange exchange) {
 
+  private BitfinexConfig bitfinexConfig;
+
+  public BitfinexAccountServiceRaw(Exchange exchange) {
     super(exchange);
+
+    this.bitfinexConfig = RestProxyFactory.createProxy(
+            BitfinexConfig.class,
+            exchange.getExchangeSpecification().getSslUri(),
+            getClientConfig());
   }
 
   public BitfinexTradingFeeResponse[] getBitfinexDynamicTradingFees() throws IOException {
@@ -120,20 +130,10 @@ public class BitfinexAccountServiceRaw extends BitfinexBaseService {
 
   public BitfinexDepositAddressResponse requestDepositAddressRaw(String currency)
       throws IOException {
-    String type = "unknown";
-    if (currency.equalsIgnoreCase("BTC")) {
-      type = "bitcoin";
-    } else if (currency.equalsIgnoreCase("LTC")) {
-      type = "litecoin";
-    } else if (currency.equalsIgnoreCase("ETH")) {
-      type = "ethereum";
-    } else if (currency.equalsIgnoreCase("IOT")) {
-      type = "iota";
-    } else if (currency.equalsIgnoreCase("BCH")) {
-      type = "bcash";
-    } else if (currency.equalsIgnoreCase("BTG")) {
-      type = "bgold";
-    }
+
+    BitfinexCurrencyLabels currencyLabels = bitfinexConfig.getCurrencyLabels();
+
+    String type = currencyLabels.getLabel(currency);
 
     BitfinexDepositAddressResponse requestDepositAddressResponse =
         bitfinex.requestDeposit(
